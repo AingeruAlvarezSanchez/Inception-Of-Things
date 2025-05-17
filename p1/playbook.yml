@@ -1,0 +1,18 @@
+---
+- name: Preparar Alpine Linux para Ansible
+  hosts: all
+  become: true
+  tasks:
+    - name: Instalar Python en Alpine
+      raw: |
+        if ! command -v python3; then
+          apk update && apk add python3 py3-pip
+        fi
+      changed_when: false
+
+- name: Provisionar nodos con Ansible
+  hosts: all
+  become: true
+  tasks:
+    - name: Mostrar nombre del host
+      command: hostname

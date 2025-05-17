@@ -1,18 +1,59 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+# require_relative 'lib/lib'
 
-Vagrant.configure("2") do |config|
-    config.vm.box = "generic/alpine319"
+Vagrant.configure('2') do |config|
+  config.vm.box = 'generic/alpine319'
 
-    config.vm.define :aalvarez do |machine|
-        machine.vm.hostname = "aalvarezSW"
-        machine.vm.network "private_network", ip: "192.168.56.111"
+  def nodes
+    [
+      {
+        nombre: 'dugonzal',
+        network_address: '192.168.56.111',
+        memory: 2048,
+        cpu: 4
+      },
+      {
+        nombre: 'aalvarez',
+        network_address: '192.168.56.112',
+        memory: 1024,
+        cpu: 2
+      }
+    ]
+  end
 
-        machine.vm.provider :libvirt do |lv|
-            lv.memory = "2048"
-            lv.cpus = 2
-            lv.default_prefix = ""
-        end
+  #
+  # Vagrant.configure("2") do |config|
+  #
+  #
 
+  #  Config.new
+  nodes.each do |nodo|
+    # puts 'network_address :' + nodo[:network_address]
+    config.vm.define nodo[:nombre] do |machine|
+      machine.vm.hostname = nodo[:nombre]
+      machine.vm.network 'private_network', ip: nodo[:network_address]
+
+      machine.vm.provider :libvirt do |lv|
+        lv.memory = nodo[:memory]
+        lv.cpus = nodo[:cpu]
+        lv.default_prefix = ''
+      end
+
+      # Instala Python3
+      machine.vm.provision 'shell', inline: <<-SHELL
+        apk update && apk add --no-cache python3 py3-pip
+        ln -sf /usr/bin/python3 /usr/bin/python
+      SHELL
+
+      # Provisión con Ansible desde dentro de cada VM
+      machine.vm.provision 'ansible' do |ansible|
+        ansible.playbook = 'playbook.yml'
+        ansible.verbose = 'vvvv'
+        ansible.extra_vars = {
+          ansible_python_interpreter: '/usr/bin/python3'
+        }
+      end
     end
+  end
 end
