@@ -2,34 +2,6 @@
 
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+require_relative 'lib/VagrantClusterConfigurator'
 
-require 'json'
-
-nodes = JSON.parse(
-  File.read('confs/config.json'),
-  symbolize_names: true
-)
-
-Vagrant.configure('2') do |config|
-  config.vm.box = 'generic/alpine319'
-  config.vm.box_check_update = false
-
-  nodes.each do |node|
-    config.vm.define node[:name] do |machine|
-      machine.vm.hostname = node[:hostname]
-      machine.vm.network 'private_network', ip: node[:network_address]
-      machine.vm.provider :libvirt do |lv|
-        lv.default_prefix = ''
-        lv.memory = node[:memory]
-        lv.cpus = node[:cpus]
-      end
-
-      # Provision the machine
-      machine.vm.provision 'shell', path: 'scripts/bootstrap.sh'
-      machine.vm.provision 'ansible' do |ansible|
-        ansible.inventory_path = 'scripts/ansible/inventory.ini'
-        ansible.playbook = 'scripts/ansible/playbook.yml'
-      end
-    end
-  end
-end
+vagrant = VagrantClusterConfigurator.new("confs/config.json")
