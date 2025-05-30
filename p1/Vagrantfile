@@ -4,4 +4,4 @@
 # vi: set ft=ruby :
 require_relative 'lib/VagrantClusterConfigurator'
 
-vagrant = VagrantClusterConfigurator.new("confs/config.json")
+vagrant = VagrantClusterConfigurator.new(path: 'confs/config.json')
