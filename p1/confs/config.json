@@ -2,7 +2,10 @@
   {
     "name": "dugonzal",
     "hostname": "dugonzalS",
+    "box": "generic/alpine319",
     "network_address": "192.168.56.110",
+    "libvirt_network": "inception",
+    "mac": "52:54:00:00:56:10",
     "network_port": 6443,
     "memory": 1024,
     "cpus": 2
@@ -10,7 +13,10 @@
   {
     "name": "aalvarez",
     "hostname": "aalvarezSW",
+    "box": "generic/alpine319",
     "network_address": "192.168.56.111",
+    "mac_address": "52:54:00:00:56:11",
+    "libvirt_network_name": "inception",
     "network_port": 6443,
     "memory": 2048,
     "cpus": 4

@@ -1,77 +1,34 @@
 ---
-- name: Wait for the token to generate
-  wait_for:
-    path: /var/lib/rancher/k3s/server/token
-    timeout: 60
-  delegate_to: "{{ groups['servers'][0] }}"
-
-- name: Ensure curl is present
-  package:
-    name: curl
-    state: present
-
-- name: Download K3s install script
-  get_url:
-    url: https://get.k3s.io
-    dest: /tmp/install_k3s.sh
-    mode: '0755'
-    force: no
-
-- name: Fetch token from server
-  slurp:
-    src: /var/lib/rancher/k3s/server/token
-  register: slurped_token
-  delegate_to: "{{ groups['servers'][0] }}"
-  run_once: true
-
-- name: Decode and set server token
-  set_fact:
-    k3s_token: "{{ slurped_token.content | b64decode }}"
-  run_once: true
-
-- name: Set server IP
-  set_fact:
-    k3s_server_ip: "{{ hostvars[ groups['servers'][0] ].ansible_host }}"
-  run_once: true
-
-- name: Bootstrap K3s agent
-  shell: |
-    INSTALL_K3S_EXEC="--tls-san 192.168.56.111" \
-    K3S_URL=https://192.168.56.110:6443 \
-    K3S_TOKEN=1234 \
-    sh /tmp/install_k3s.sh
-  args:
-    executable: /bin/sh
-    creates: /usr/local/bin/k3s
-
-- name: Enable and start k3s service
-  service:
-    name: k3s-agent
-    state: started
-    enabled: true
-
-- name: Asegurar que ~/.kube existe
-  file:
-    path: /home/vagrant/.kube
-    state: directory
-    owner: vagrant
-    group: vagrant
-    mode: '0777'
-
-- name: Copiar kubeconfig a la máquina local
-  delegate_to: "{{ groups['servers'][0] }}"
-  fetch:
-    src: /etc/rancher/k3s/k3s.yaml
-    dest: /home/vagrant/.kube/config
-    flat: yes
-
-- name: wait for kubeconfig file creation
-  wait_for:
-    path: /etc/rancher/k3s/k3s.yaml
-    timeout: 60
-
-- name: Reemplazar 127.0.0.1 con IP real
-  replace:
-    path: /etc/rancher/k3s/k3s.yaml
-    regexp: '127.0.0.1'
-    replace: '192.168.56.110:6443'
+- name: hola
+  debug:
+    msg: "{{ ansible_host }}"
+  #wait_for:
+  #   path: /var/lib/rancher/k3s/server/token
+#     timeout: 60
+#   delegate_to: "{{ groups['servers'][0] }}"
+#
+# - name: Ensure curl is present
+#   package:
+#     name: curl
+#     state: present
+#
+# - name: Download K3s install script
+#   get_url:
+#     url: https://get.k3s.io
+#     dest: /tmp/install_k3s.sh
+#     mode: "0755"
+#     force: no
+# - name: Bootstrap K3s agent
+#   shell: |
+#     INSTALL_K3S_EXEC="--tls-san 192.168.56.111" \
+#     K3S_URL=https://192.168.56.110:6443 \
+#     K3S_TOKEN=1234 \
+#     sh /tmp/install_k3s.sh
+#   args:
+#     executable: /bin/sh
+#     creates: /usr/local/bin/k3s
+# - name: Enable and start k3s service
+#   service:
+#     name: k3s-agent
+#     state: started
+#     enabled: true

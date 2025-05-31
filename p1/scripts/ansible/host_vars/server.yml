@@ -1,0 +1,2 @@
+k3s_tls_san: "{{ ansible_host }}"
+k3s_token_custom: mysecrettoken123

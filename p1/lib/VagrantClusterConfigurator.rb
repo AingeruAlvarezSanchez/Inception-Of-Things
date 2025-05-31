@@ -1,62 +1,41 @@
-
-
 # frozen_string_literal: true
 
-require 'json'
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
 
-class VagrantClusterConfigurator
-  DEFAULT_BOX       = 'generic/alpine319'
-  DEFAULT_INVENTORY = 'scripts/ansible/inventory.ini'
-  DEFAULT_PLAYBOOK  = 'scripts/ansible/playbook.yml'
-  DEFAULT_SCRIPT    = 'scripts/bootstrap.sh'
+require_relative 'Utils'
+
+class VagrantClusterConfigurator < Utils
+  DEFAULT_VERBOSE   = '--verbose'
   DEFAULT_PATH      = 'confs/config.json'
-  DEFAULT_VERBOSE   = 'vvv'
-  attr_reader :nodes
-  
+  DEFAULT_SCRIPT    = 'scripts/bootstrap.sh'
+  DEFAULT_PLAYBOOK  = 'scripts/ansible/playbook.yml'
+  DEFAULT_INVENTORY = 'scripts/ansible/inventory.ini'
+  attr_reader :nodes, :path, :script, :verbose, :playbook, :inventory 
 
-  def initialize(path: DEFAULT_PATH, box: DEFAULT_BOX, inventory: DEFAULT_INVENTORY, playbook: DEFAULT_PLAYBOOK, script: DEFAULT_SCRIPT, verbose: DEFAULT_VERBOSE)
-    @path      = path
-    @box       = box
-    @inventory = inventory
-    @playbook  = playbook
-    @script    = script
+  def initialize(path: DEFAULT_PATH, inventory: DEFAULT_INVENTORY, playbook: DEFAULT_PLAYBOOK, script: DEFAULT_SCRIPT, verbose: DEFAULT_VERBOSE)
     @nodes     = []
-    @box       = box
+    @path      = path
+    @script    = script
     @verbose   = verbose 
+    @playbook  = playbook
+    @inventory = inventory
 
-    validate_configuration
-    read_file
+    Utils.validate_conf_vagrant(@path, @inventory, @playbook, @script)
+    @nodes = Utils.read_file(@path)
     generate
   end
 
   private
 
-  private def validate_configuration
-    validate_file(@path, '.json', 'Path must be a valid JSON file')
-    validate_file(@inventory, '.ini', 'Inventory must be an INI file')
-    validate_file(@playbook, '.yml', 'Playbook must be a YAML file')
-    raise 'Box name cannot be nil or empty' if @box.to_s.strip.empty?
-  end
-
-  private  def validate_file(path, ext, msg)
-    raise "#{msg}: path is nil or empty" if path.nil? || path.strip.empty?
-    raise "#{msg}: file does not exist: #{path}" unless File.exist?(path)
-    raise "#{msg}: invalid extension: #{path}" unless File.extname(path) == ext
-  end
-
-  private def read_file()
-    @nodes = JSON.parse(File.read(@path), symbolize_names: true)
-    raise 'No nodes defined in JSON' if @nodes.empty?
-  end
-
   private def generate
     raise 'No nodes defined' if @nodes.empty?
 
     Vagrant.configure('2') do |config|
-      config.vm.box = @box
       config.vm.box_check_update = true
 
       @nodes.each do |node|
+        config.vm.box =  node[:box] || 'generic/alpine319'
         provision_node(config, node)
       end
     end
@@ -65,7 +44,17 @@ class VagrantClusterConfigurator
   private  def provision_node(config, node)
     config.vm.define node[:name] do |machine|
       machine.vm.hostname = node[:hostname]
-      machine.vm.network 'private_network', ip: node[:network_address]
+      machine.vm.network :public_network,
+        ip: node[:network_address],
+        mac: node[:mac_address],
+        bridge: "br0",
+        dev: "br0",
+        mode: "bridge",
+        type: "bridge",
+        libvirt__network_name: "br0",
+        libvirt__forward_mode: "bridge"
+      machine.vm.synced_folder 'scripts', '/vagrant/scripts',
+      #type: 'rsync',
       provision_libvirt(machine, node)
       provision_ansible(machine)
     end

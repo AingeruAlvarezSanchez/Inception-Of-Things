@@ -1,48 +1,51 @@
 ---
 - name: Ensure curl is present
-  package:
-    name: curl
-    state: present
-
-- name: Download K3s install script
-  get_url:
-    url: https://get.k3s.io
-    dest: /tmp/install_k3s.sh
-    mode: '0755'
-    force: no
-
-- name: Bootstrap K3s server (control-plane only)
-  shell: |
-    INSTALL_K3S_EXEC="server --disable-agent --token 1234 --tls-san 192.168.56.110 --write-kubeconfig /etc/rancher/k3s/k3s.yaml" \
-    sh /tmp/install_k3s.sh
-  args:
-    executable: /bin/sh
-    creates: /usr/local/bin/k3s
-
-- name: Enable and start k3s service
-  service:
-    name: k3s
-    state: started
-    enabled: true
-
-- name: wait for kubeconfig file creation
-  wait_for:
-    path: /etc/rancher/k3s/k3s.yaml
-    timeout: 60
-
-- name: Asegurar que ~/.kube existe
-  file:
-    path: /home/vagrant/.kube
-    state: directory
-    owner: vagrant
-    group: vagrant
-    mode: '0755'
-
-- name: Copiar kubeconfig como config global
-  ansible.builtin.copy:
-    remote_src: true
-    src: /etc/rancher/k3s/k3s.yaml
-    dest: /home/vagrant/.kube/config
-    owner: vagrant
-    group: vagrant
-    mode: '0777'
+  debug:
+    msg: "hola mundo"
+  # - name: Ensure curl is present
+#   package:
+#     name: curl
+#     state: present
+#
+# - name: Download K3s install script
+#   get_url:
+#     url: https://get.k3s.io
+#     dest: /tmp/install_k3s.sh
+#     mode: "0755"
+#     force: no
+#
+# - name: Bootstrap K3s server (control-plane only)
+#   shell: |
+#     INSTALL_K3S_EXEC="server --disable-agent --tls-san {{ server }} --write-kubeconfig /etc/rancher/k3s/k3s.yaml" \
+#     sh /tmp/install_k3s.sh
+#   args:
+#     executable: /bin/sh
+#     creates: /usr/local/bin/k3s
+#
+# - name: Enable and start k3s service
+#   service:
+#     name: k3s
+#     state: started
+#     enabled: true
+#
+# - name: wait for kubeconfig file creation
+#   wait_for:
+#     path: /etc/rancher/k3s/k3s.yaml
+#     timeout: 60
+#
+# - name: Asegurar que ~/.kube existe
+#   file:
+#     path: /home/vagrant/.kube
+#     state: directory
+#     owner: vagrant
+#     group: vagrant
+#     mode: "0755"
+#
+# - name: Copiar kubeconfig como config global
+#   copy:
+#     remote_src: true
+#     src: /etc/rancher/k3s/k3s.yaml
+#     dest: /home/vagrant/.kube/config
+#     owner: vagrant
+#     group: vagrant
+#     mode: "0777"
