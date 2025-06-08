@@ -1,0 +1,39 @@
+- name: Install k3s on servers
+  hosts: servers
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  become: true
+  roles:
+    - server
+
+- name: Install k3s on agents
+  hosts: agents
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  become: true
+  roles:
+    - agent
+
+- name: Install kubectl
+  hosts: all
+  become: true
+  vars:
+    kubectl_version_url: "https://dl.k8s.io/release/stable.txt"
+
+  tasks:
+    - name: Ensure curl is present
+      package:
+        name: curl
+        state: present
+
+    - name: Download latest kubectl binary
+      get_url:
+        url: >-
+          https://dl.k8s.io/release/{{ lookup('ansible.builtin.url', kubectl_version_url) | trim }}/bin/linux/amd64/kubectl
+        checksum: >-
+          sha256:https://dl.k8s.io/release/{{ lookup('ansible.builtin.url', kubectl_version_url) | trim }}/bin/linux/amd64/kubectl.sha256
+        dest: /usr/local/bin/kubectl
+        mode: '0755'
+        owner: root
+        group: root
+        force: yes

@@ -1,0 +1,42 @@
+---
+- name: Ensure curl is present
+  package:
+    name: curl
+    state: present
+
+- name: Download K3s install script
+  get_url:
+    url: https://get.k3s.io
+    dest: /tmp/install_k3s.sh
+    mode: '0755'
+    force: no
+
+- name: Wait for /etc/rancher/k3s/k3s.yaml to appear
+  become: true
+  delegate_to: "{{ groups['servers'][0] }}"
+  wait_for:
+    path: "/var/lib/rancher/k3s/server/node-token"
+    state: present
+    timeout: 60
+
+- name: Retrieve cluster token from the first server
+  become: true
+  slurp:
+    src: /var/lib/rancher/k3s/server/node-token
+  delegate_to: "{{ groups['servers'][0] }}"
+  register: raw_token
+
+- name: Decode and save cluster_token
+  set_fact:
+    token: "{{ (raw_token.content | b64decode).strip() }}"
+
+- name: Bootstrap K3s server
+  shell: |
+    INSTALL_K3S_EXEC="agent \
+    --server https://{{ hostvars[ groups['servers'][0] ].ansible_host }}:6443 \
+    --node-ip {{ hostvars[ groups['agents'][0] ].ansible_host }} \
+    --token {{ token }}" \
+    sh /tmp/install_k3s.sh
+  args:
+    executable: /bin/sh
+    creates: /usr/local/bin/k3s

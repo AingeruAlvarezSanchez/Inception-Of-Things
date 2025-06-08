@@ -1,0 +1,46 @@
+---
+- name: Ensure curl is present
+  package:
+    name: curl
+    state: present
+
+- name: Download K3s install script
+  get_url:
+    url: https://get.k3s.io
+    dest: /tmp/install_k3s.sh
+    mode: '0755'
+    force: no
+
+- name: Bootstrap K3s server
+  shell: |
+    INSTALL_K3S_EXEC="server \
+    --node-ip {{ hostvars[ groups['servers'][0] ].ansible_host }} \
+    --tls-san {{ hostvars[ groups['agents'][0] ].ansible_host }}" \
+    sh /tmp/install_k3s.sh
+  args:
+    executable: /bin/sh
+    creates: /usr/local/bin/k3s
+
+- name: Create ~/.kube directory for the SSH user
+  become: false
+  file:
+    path: "/home/vagrant/.kube"
+    state: directory
+    mode: '0700'
+
+- name: Wait for /etc/rancher/k3s/k3s.yaml to appear
+  become: true
+  wait_for:
+    path: "/etc/rancher/k3s/k3s.yaml"
+    state: present
+    timeout: 60
+
+- name: Copy k3s’s kubeconfig into the user’s home
+  become: true
+  copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: "/home/vagrant/.kube/config"
+    remote_src: yes
+    owner: vagrant
+    group: vagrant
+    mode: '0600'
