@@ -5,7 +5,6 @@
 
 require 'json'
 
-
 class Utils
   def self.validate_conf_vagrant(*args)
     expected = ['.json', '.ini', '.yml', '.sh']

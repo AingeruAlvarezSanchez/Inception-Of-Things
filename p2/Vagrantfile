@@ -2,6 +2,6 @@
 
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-require_relative 'lib/VagrantClusterConfigurator'
+require_relative '../lib/VagrantClusterConfigurator'
 
 vagrant = VagrantClusterConfigurator.new
