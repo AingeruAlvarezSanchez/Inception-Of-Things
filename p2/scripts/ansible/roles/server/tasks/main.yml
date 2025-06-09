@@ -3,12 +3,13 @@
   get_url:
     url: https://get.k3s.io
     dest: /tmp/install_k3s.sh
-    mode: '0755'
+    mode: "0755"
     force: no
 
 - name: Bootstrap K3s server
   shell: |
-    INSTALL_K3S_EXEC="server \
+    INSTALL_K3S_EXEC="server \ 
+    --cluster-init \ 
     --node-ip {{ hostvars[ groups['servers'][0] ].ansible_host }}" \
     sh /tmp/install_k3s.sh
   args:
@@ -20,7 +21,7 @@
   file:
     path: "/home/vagrant/.kube"
     state: directory
-    mode: '0700'
+    mode: "0700"
 
 - name: Wait for /etc/rancher/k3s/k3s.yaml to appear
   become: true
@@ -37,4 +38,4 @@
     remote_src: yes
     owner: vagrant
     group: vagrant
-    mode: '0600'
+    mode: "0644"

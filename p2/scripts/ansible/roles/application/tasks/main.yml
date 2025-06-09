@@ -1,5 +1,5 @@
----
-dependencies:
-  - role: app1
-  - role: app2
-  - role: app3
+# ---
+# dependencies:
+#   - role: app1
+#   - role: app2
+#   - role: app3
