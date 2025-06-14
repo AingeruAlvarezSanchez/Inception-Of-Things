@@ -11,3 +11,8 @@ k3s_server_args: >
   --node-ip {{ network_address }}
 
 network_address: ""
+
+docker_daemon:
+  - rc-update add docker default
+  - service docker start
+  - addgroup ${USER} docker

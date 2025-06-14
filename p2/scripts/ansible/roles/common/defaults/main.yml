@@ -8,3 +8,9 @@ common_packages:
   - curl
   - helm
   - kubectl
+  - docker
+
+docker_daemon:
+  - rc-update add docker default
+  - service docker start
+  - addgroup ${USER} docker
