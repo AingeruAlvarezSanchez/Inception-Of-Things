@@ -9,7 +9,7 @@ common_packages:
   - docker
   - kubectl
 
-update_packages: apk update
+update_repositories: apk update
 
 docker_daemon:
   - rc-update add docker default
