@@ -9,9 +9,9 @@ class VagrantClusterConfigurator < Utils
   DEFAULT_VERBOSE   = '--verbose'
   DEFAULT_PATH      = 'confs/config.json'
   DEFAULT_SCRIPT    = 'scripts/bootstrap.sh'
-  DEFAULT_CFG = "scripts/ansible.cfg"
+  DEFAULT_CFG       = "scripts/ansible.cfg"
   DEFAULT_PLAYBOOK  = 'scripts/ansible/playbook/site.yml'
-  DEFAULT_INVENTORY = 'scripts/ansible/inventory/inventory.ini'
+  DEFAULT_INVENTORY = 'scripts/ansible/inventory/dev/inventory.ini'
   attr_reader :nodes, :path, :script, :verbose, :playbook, :inventory, :cfg
 
   def initialize(path: DEFAULT_PATH, inventory: DEFAULT_INVENTORY, playbook: DEFAULT_PLAYBOOK, script: DEFAULT_SCRIPT, verbose: DEFAULT_VERBOSE, cfg: DEFAULT_CFG)
@@ -27,8 +27,6 @@ class VagrantClusterConfigurator < Utils
     @nodes = Utils.read_file(@path)
     generate
   end
-
-  private
 
   private def generate
     raise 'No nodes defined' if @nodes.empty?

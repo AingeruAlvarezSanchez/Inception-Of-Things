@@ -12,10 +12,9 @@
   until: k3s_download is succeeded
 
 - name: "▶️ Bootstrap K3s server (si no está instalado)"
-  become: true
   shell: |
     INSTALL_K3S_EXEC="{{ k3s_server_args }}" \
-    sh "{{ k3s_install_script }}"
+    bash "{{ k3s_install_script }}"
   args:
-    executable: /bin/sh
+    executable: /bin/bash
     creates: /usr/local/bin/k3s

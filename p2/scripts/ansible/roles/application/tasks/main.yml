@@ -1,5 +1,2 @@
-# ---
-# dependencies:
-#   - role: app1
-#   - role: app2
-#   - role: app3
+---
+include_task: app_one.yml
