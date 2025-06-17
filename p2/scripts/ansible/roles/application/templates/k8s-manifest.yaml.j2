@@ -21,7 +21,7 @@ spec:
           ports:
             - containerPort: {{ item.port }}
           volumeMounts:
-            - name: index
+            - name: custom-html
               mountPath: /usr/share/nginx/html/index.html
               subPath: index.html
       volumes:

@@ -1,10 +1,10 @@
 [
   {
-    "name": "dugonzal",
-    "hostname": "dugonzalS",
+    "name": "dugonzalS",
+    "hostname": "inception",
     "network_address": "192.168.56.110",
     "network_port": 6443,
-    "memory": 1024,
-    "cpus": 2
+    "memory": 2048,
+    "cpus": 4
   }
 ]
