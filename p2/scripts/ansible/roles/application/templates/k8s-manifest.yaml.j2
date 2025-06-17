@@ -20,6 +20,17 @@ spec:
           image: {{ item.image }}
           ports:
             - containerPort: {{ item.port }}
+          volumeMounts:
+            - name: index
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
+      volumes:
+        - name: custom-html
+          configMap:
+            name: {{ item.name }}-config
+            items:
+              - key: index.html
+                path: index.html
 
 ---
 apiVersion: v1
@@ -63,3 +74,25 @@ spec:
                 name: app3-svc
                 port:
                   number: 80
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ item.name }}-config
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="utf-8" />
+      <title>{{ item.name }}</title>
+      <style>
+        body{font-family:sans-serif;text-align:center;margin-top:15%}
+        h1{font-size:3rem;color:#06c}
+      </style>
+    </head>
+    <body>
+      <h1>¡Hola, soy {{ item.name }}!</h1>
+    </body>
+    </html>
