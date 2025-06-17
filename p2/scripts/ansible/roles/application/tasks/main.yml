@@ -1,5 +1,29 @@
 ---
-dependencies:
-  - role: app1
-  - role: app2
-  - role: app3
+- name: Install Python 3 and pip on Alpine
+  become: true
+  apk:
+    name:
+      - python3
+      - py3-pip
+    update_cache: yes
+    state: present
+
+- name: Install Kubernetes Python client
+  become: true
+  pip:
+    name: kubernetes
+    executable: pip3
+
+- name: Load apps configuration
+  set_fact:
+    apps: "{{ lookup('file', playbook_dir + '/../vars/apps.json') | from_json }}"
+
+- name: Deploy applications to Kubernetes
+  k8s:
+    kubeconfig: /home/vagrant/.kube/config
+    state: present
+    namespace: default
+    definition: "{{ lookup('template', 'k8s-manifest.yaml.j2') }}"
+  loop: "{{ apps }}"
+  loop_control:
+    label: "{{ item.name }}"

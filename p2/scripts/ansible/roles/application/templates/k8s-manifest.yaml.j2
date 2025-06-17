@@ -1,0 +1,65 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ item.name }}
+  labels:
+    app: {{ item.name }}
+spec:
+  replicas: {{ item.replicas }}
+  selector:
+    matchLabels:
+      app: {{ item.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ item.name }}
+    spec:
+      containers:
+        - name: {{ item.name }}
+          image: {{ item.image }}
+          ports:
+            - containerPort: {{ item.port }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ item.name }}-svc
+spec:
+  selector:
+    app: {{ item.name }}
+  ports:
+    - protocol: TCP
+      port: {{ item.port }}
+      targetPort: {{ item.port }}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ item.name }}-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: {{ item.ingress_host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ item.name }}-svc
+                port:
+                  number: {{ item.port }}
+    - host: ""
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app3-svc
+                port:
+                  number: 80
