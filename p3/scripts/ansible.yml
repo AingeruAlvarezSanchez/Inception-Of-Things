@@ -1,0 +1,45 @@
+# install-argocd.yml
+- name: Setup local k3d + Argo CD environment
+  hosts: localhost
+  connection: local
+  become: true
+  vars:
+    cluster_name: inception
+    dev_namespace: dev
+    manifest_dir: manifest
+
+  tasks:
+    - name: Create k3d cluster
+      shell: k3d cluster create inception
+    # crear una condicionn que solo cree cuando este creado
+    - name: namespaces
+      shell: kubectl create namespace argocd && kubectl create namespace dev
+
+    - name: argocd apply in cluster
+      shell: kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+    - name: Wait for Argo CD CRD 'Application' to be established
+      shell: kubectl wait --for condition=established crd/applications.argoproj.io --timeout=60s
+
+    - name: Deploy application manifests into 'dev'
+      shell: kubectl apply -f {{ playbook_dir }}/manifest/
+
+    - name: Wait for argocd-server pod to be ready
+      shell: kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=argocd-server -n argocd --timeout=120s
+
+    - name: Launch port-forward in background (retries until success)
+      async: 3600
+      poll: 0
+      shell: |
+        bash -c 'until kubectl -n argocd port-forward svc/argocd-server 8080:443; do
+          sleep 5
+        done'
+
+    - name: Retrieve initial admin password
+      shell: kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+      register: admin_pass
+      args: { warn: false }
+
+    - name: Show Argo CD admin password
+      debug:
+        msg: "Argo CD 'admin' password → {{ admin_pass.stdout }}"
