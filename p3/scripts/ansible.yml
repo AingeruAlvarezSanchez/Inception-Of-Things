@@ -10,6 +10,9 @@
 
   tasks:
     - name: Create k3d cluster
+      shell: k3d cluster delete inception
+
+    - name: Create k3d cluster
       shell: k3d cluster create inception
     # crear una condicionn que solo cree cuando este creado
     - name: namespaces
@@ -22,18 +25,19 @@
       shell: kubectl wait --for condition=established crd/applications.argoproj.io --timeout=60s
 
     - name: Deploy application manifests into 'dev'
-      shell: kubectl apply -f {{ playbook_dir }}/manifest/
+      shell: git clone https://github.com/dugonzal/dugonzal_ci_di.git && cd dugonzal_ci_di && kubectl apply -f manifest
 
     - name: Wait for argocd-server pod to be ready
-      shell: kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=argocd-server -n argocd --timeout=120s
+      shell: |
+        kubectl wait \
+        --for=condition=available \
+        deployment/argocd-server \
+        -n argocd \
+        --timeout=2m
 
     - name: Launch port-forward in background (retries until success)
-      async: 3600
-      poll: 0
       shell: |
-        bash -c 'until kubectl -n argocd port-forward svc/argocd-server 8080:443; do
-          sleep 5
-        done'
+        kubectl -n argocd port-forward svc/argocd-server 8080:443
 
     - name: Retrieve initial admin password
       shell: kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d

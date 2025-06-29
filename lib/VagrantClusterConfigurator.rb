@@ -35,7 +35,8 @@ class VagrantClusterConfigurator
       config.vm.box_check_update = true
 
       @nodes.each do |node|
-        config.vm.box =  node[:box] || 'generic/alpine319'
+        
+        config.vm.box = node[:box] || 'generic/alpine319'
         provision_node(config, node)
       end
     end

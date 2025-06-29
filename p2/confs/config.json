@@ -5,6 +5,7 @@
     "network_address": "192.168.56.110",
     "network_port": 6443,
     "memory": 1024,
-    "cpus": 2
+    "cpus": 2,
+    "box": "cloud-image/alpine-3.22"
   }
 ]

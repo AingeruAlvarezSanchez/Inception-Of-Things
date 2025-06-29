@@ -5,7 +5,8 @@
     "network_address": "192.168.56.110",
     "network_port": 6443,
     "memory": 1024,
-    "cpus": 2
+    "cpus": 2,
+    "box": "migarcia-ingonzal/IOT_Alpine_3.22"
   },
   {
     "name": "aalvarez",
@@ -13,6 +14,7 @@
     "network_address": "192.168.56.111",
     "network_port": 6443,
     "memory": 2048,
-    "cpus": 4
+    "cpus": 4,
+    "box": "generic/migarcia-ingonzal/IOT_Alpine_3.22"
   }
 ]
