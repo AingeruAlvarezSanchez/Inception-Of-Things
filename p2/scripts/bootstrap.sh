@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-apk update
-apk add --no-cache python3 py3-pip
+apt update
+apt install python3 python3-pip -y

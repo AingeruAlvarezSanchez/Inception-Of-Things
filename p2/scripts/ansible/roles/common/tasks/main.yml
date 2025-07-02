@@ -1,33 +1,12 @@
 ---
-- name: "Ensure repository alpine /etc/apk/repositories"
-  become: true
-  lineinfile:
-    path: /etc/apk/repositories
-    create: yes
-    owner: root
-    group: root
-    mode: "0644"
-    line: "{{ item }}"
-    state: present
-  loop: "{{ alpine_apk_repositories }}"
-
-- name: "Update package"
-  become: true
-  command: "{{ update_packages }}"
-
 - name: "package present"
   become: true
   package:
     name: "{{ common_packages }}"
     state: present
 
-- name: Install Kubernetes Python client
-  become: true
+- name: Instalar Kubernetes Python client (rompiendo sistema)
   pip:
     name: kubernetes
     executable: pip3
-
-- name: "Config Daemon Docker"
-  become: true
-  command: "{{ item }}"
-  loop: "{{ docker_daemon }}"
+    extra_args: --break-system-packages

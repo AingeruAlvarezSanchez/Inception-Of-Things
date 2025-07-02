@@ -1,13 +1,9 @@
-alpine_apk_repositories:
-  - "https://mirrors.edge.kernel.org/alpine/v3.22/main"
-  - "https://mirrors.edge.kernel.org/alpine/v3.22/community"
-
 common_packages:
   - git
   - curl
-  - helm
+  #  - helm
   - docker
-  - kubectl
+#  - kubectl
 
 update_packages: apk update
 
