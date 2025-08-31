@@ -1,0 +1,73 @@
+certmanager-issuer:
+  email: "ciclo@example.com"
+global:
+  certmanager:
+    install: false
+  ingress:
+    enabled: true
+    provider: traefik
+    class: traefik
+    annotations:
+      traefik.ingress.kubernetes.io/router.tls: "true"
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    ingressClassResource:
+      name: traefik
+      controller: traefik.io/ingress-controller
+
+    gitlab-shell:
+      traefik:
+        entrypoint: "gitlab-shell"
+    gitlab:
+    edition: ce
+nginx-ingress:
+  # Disable the deployment of the in-chart NGINX Ingress provider.
+  enabled: false
+
+traefik:
+  install: true
+  # Ensure the IngressClass name and `global.ingress.class` value match.
+  # This can be removed if `global.ingress.class` is set to `$releaseName-traefik`.
+  fullnameOverride: traefik
+  ingressClass:
+    # Create an IngressClass object for Traefik.
+    enabled: true
+    # Helps an avoid error when making local templates.
+    fallbackApiVersion: v1
+
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+  hosts:
+    - gitlab.example.com
+  tls:
+    - secretName: gitlab-tls
+      hosts:
+        - gitlab.example.com
+
+gitlab:
+  postgresql:
+    install: true
+    persistence:
+      enabled: true
+      size: 8Gi
+  redis:
+    install: true
+    persistence:
+      enabled: true
+      size: 4Gi
+  webservice:
+    replicas: 1
+  sidekiq:
+    replicas: 1
+
+resources:
+  requests:
+    cpu: "500m"
+    memory: "1Gi"
+  limits:
+    cpu: "1"
+    memory: "2Gi"

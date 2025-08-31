@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ cfg.name }}
+  labels:
+    app: {{ cfg.name }}
+spec:
+  replicas: {{ cfg.replicas }}
+  selector:
+    matchLabels:
+      app: {{ cfg.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ cfg.name }}
+    spec:
+      containers:
+        - name: {{ cfg.name }}
+          image: {{ cfg.image }}
+          ports:
+            - containerPort: {{ cfg.port }}
+          volumeMounts:
+            - name: {{ cfg.mount.name }}
+              mountPath: {{ cfg.mount.path }}
+              subPath: {{ cfg.mount.sub_path }}
+      volumes:
+        - name: custom-html
+          configMap:
+            name: {{ cfg.name }}-config
+            items:
+              - key: {{ cfg.mount.sub_path }}
+                path: {{ cfg.mount.sub_path }}

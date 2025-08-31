@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: gitlab-tls
+  namespace: gitlab
+spec:
+  secretName: gitlab-tls
+  commonName: gitlab.example.com
+  dnsNames:
+    - gitlab.example.com
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+  duration: 2160h # 90 días, puedes ajustar en medida de la prueba, pero no son reales xd
+  renewBefore: 360h # Renueva 15 días antes de expirar
+

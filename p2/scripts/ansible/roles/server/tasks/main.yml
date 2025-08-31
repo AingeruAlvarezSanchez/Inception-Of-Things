@@ -1,0 +1,4 @@
+- name: 1) Install K3S
+  import_tasks: install.yml
+- name: 2) Config Kube Config
+  import_tasks: kube_cfg.yml

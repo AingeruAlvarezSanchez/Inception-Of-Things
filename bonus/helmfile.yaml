@@ -1,0 +1,25 @@
+repositories:
+  # - name: traefik
+  #   url: https://helm.traefik.io/traefik
+  - name: gitlab
+    url: https://charts.gitlab.io
+  - name: argo
+    url: https://argoproj.github.io/argo-helm
+
+releases:
+  # - name: traefik
+  #   namespace: kube-system
+  #   chart: traefik/traefik
+  #   version: 10.3.2
+  #   values:
+  #     - values/traefik.yaml
+  - name: gitlab
+    namespace: gitlab
+    chart: gitlab/gitlab
+    version: 9.1.2
+    values:
+      - values/gitlab.yaml
+
+  - name: argocd
+    namespace: argocd
+    chart: argo/argo-cd

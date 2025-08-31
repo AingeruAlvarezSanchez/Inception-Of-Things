@@ -1,0 +1,31 @@
+apps:
+  app1:
+    name: "app1"
+    image: "nginx:latest"
+    replicas: "1"
+    port: "80"
+    ingress_host: "app1.com"
+    mount:
+      name: custom-html
+      path: /usr/share/nginx/html/index.html
+      sub_path: index.html
+  app2:
+    name: "app2"
+    image: "nginx:latest"
+    replicas: "3"
+    port: "80"
+    ingress_host: "app2.com"
+    mount:
+      name: custom-html
+      path: /usr/share/nginx/html/index.html
+      sub_path: index.html
+  app3:
+    name: "app3"
+    image: "nginx:latest"
+    replicas: "1"
+    port: "80"
+    ingress_host: "app3.com"
+    mount:
+      name: custom-html
+      path: /usr/share/nginx/html/index.html
+      sub_path: index.html

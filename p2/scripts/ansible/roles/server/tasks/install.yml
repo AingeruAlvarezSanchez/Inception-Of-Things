@@ -1,0 +1,21 @@
+---
+- name: "🔄 Descargar script de K3s con retries y timeout"
+  get_url:
+    url: "{{ k3s_install_url }}"
+    dest: "{{ k3s_install_script }}"
+    mode: "0755"
+    force: "{{ k3s_force }}"
+    timeout: "{{ k3s_timeout }}"
+  register: k3s_download
+  retries: "{{ k3s_retries }}"
+  delay: "{{ k3s_delay }}"
+  until: k3s_download is succeeded
+
+- name: "▶️ Bootstrap K3s server (si no está instalado)"
+  become: true
+  shell: |
+    INSTALL_K3S_EXEC="{{ k3s_server_args }}" \
+    sh "{{ k3s_install_script }}"
+  args:
+    executable: /bin/sh
+    creates: /usr/local/bin/k3s

@@ -1,0 +1,12 @@
+---
+- name: "package present"
+  become: true
+  package:
+    name: "{{ common_packages }}"
+    state: present
+
+- name: Instalar Kubernetes Python client (rompiendo sistema)
+  pip:
+    name: kubernetes
+    executable: pip3
+    extra_args: --break-system-packages

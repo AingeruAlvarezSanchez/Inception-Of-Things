@@ -1,0 +1,24 @@
+---
+- name: Create ~/.kube directory for the SSH user
+  become: false
+  file:
+    path: "/home/vagrant/.kube"
+    state: directory
+    mode: "0700"
+
+- name: Wait for /etc/rancher/k3s/k3s.yaml to appear
+  become: true
+  wait_for:
+    path: "/etc/rancher/k3s/k3s.yaml"
+    state: present
+    timeout: 60
+
+- name: Copy k3s’s kubeconfig into the user’s home
+  become: true
+  copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: "/home/vagrant/.kube/config"
+    remote_src: yes
+    owner: vagrant
+    group: vagrant
+    mode: "0600"

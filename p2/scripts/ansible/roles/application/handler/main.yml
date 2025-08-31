@@ -1,0 +1,17 @@
+---
+andlers:
+  - name: "rollout app1"
+    listen: "rollout app1"
+    command: kubectl rollout restart deployment/app1
+  - name: "rollout app2"
+    listen: "rollout app2"
+    command: kubectl rollout restart deployment/app2
+  - name: "rollout app3"
+    listen: "rollout app3"
+    command: kubectl rollout restart deployment/app3
+  - name: apply manifests
+    shell: kubectl apply -f "{{ manifest_dst }}"
+    register: kapply
+    changed_when: |
+      kapply.stdout is search('configured') or
+      kapply.stdout is search('created')

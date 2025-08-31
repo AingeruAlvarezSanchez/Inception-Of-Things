@@ -1,0 +1,12 @@
+---
+- name: "create namespaces"
+  shell: kubectl create namespace inception
+  args: { executable: /bin/bash }
+  register: ns_out
+  changed_when: ns_out.rc == 0 and 'create' in ns_out.stdout
+
+- name: "apply files"
+  shell: kubectl create namespace inception
+  args: { executable: /bin/bash }
+  register: ns_out
+  changed_when: ns_out.rc == 0 and 'create' in ns_out.stdout

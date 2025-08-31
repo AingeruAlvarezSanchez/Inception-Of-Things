@@ -1,0 +1,11 @@
+k3s_install_url: "https://get.k3s.io"
+k3s_install_script: "/tmp/install_k3s.sh"
+
+k3s_timeout: 10
+k3s_retries: 3
+k3s_delay: 5
+k3s_force: true
+k3s_server_args: >
+  server
+  --cluster-init
+  --node-ip {{ network_address }}

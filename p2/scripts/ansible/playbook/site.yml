@@ -1,0 +1,8 @@
+---
+- name: Inception of Things
+  hosts: servers
+  become: yes
+  roles:
+    - common
+    - server
+    - application

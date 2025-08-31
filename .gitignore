@@ -1,2 +1,5 @@
 # Jetbrains configuration
 .idea
+
+# Vagrant files
+.vagrant

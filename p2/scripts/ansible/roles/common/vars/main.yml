@@ -1,0 +1,11 @@
+common_packages:
+  - git
+  - curl
+  - docker
+
+update_packages: apk update
+
+docker_daemon:
+  - rc-update add docker default
+  - service docker start
+  - addgroup ${USER} docker

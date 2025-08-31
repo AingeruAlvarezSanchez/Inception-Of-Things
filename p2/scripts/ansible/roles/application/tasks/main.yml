@@ -1,0 +1,7 @@
+---
+- name: "copy manifest"
+  import_tasks: copy_manifest.yaml
+
+- name: "apply manifests"
+  shell: |
+    kubectl apply --kubeconfig=/home/vagrant/.kube/config -f /tmp/

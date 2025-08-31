@@ -1,0 +1,48 @@
+deployment:
+  replicas: 1
+
+logs:
+  general:
+    level: DEBUG
+  access:
+    enabled: true
+    format: json
+    bufferingSize: 100
+
+additionalArguments:
+  - "--certificatesResolvers.letsencrypt.acme.tlsChallenge=true"
+  - "--certificatesResolvers.letsencrypt.acme.email=admin@inceptiongitlab.duckdns.org"
+  - "--certificatesResolvers.letsencrypt.acme.storage=/data/acme.json"
+  - "--entryPoints.websecure.http.tls.certResolver=letsencrypt"
+
+ports:
+  web:
+    redirectTo: websecure
+  websecure:
+    tls:
+      enabled: true
+
+persistence:
+  enabled: true
+  name: traefik-certificates
+  storageClass: local-path
+  accessMode: ReadWriteOnce
+  size: 128Mi
+  path: /data
+
+service:
+  type: LoadBalancer
+
+ingressRoute:
+  dashboard:
+    enabled: true
+    matchRule: Host(`traefik.local`)
+    entryPoints: ["websecure"]
+    tls:
+      certResolver: letsencrypt
+
+providers:
+  kubernetesCRD:
+    enabled: true
+  kubernetesIngress:
+    enabled: true
